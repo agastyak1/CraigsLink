@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Craigslist Link Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-robot"></i>
+                Craigslink - Find what you're looking for on Craigslist
+            </h1>
+            <p class="subtitle">Describe what you're looking for, and we'll generate the perfect Craigslist search link!</p>
+        </header>
+
+        <main class="main">
+            <div class="search-card">
+                <div class="input-group">
+                    <textarea 
+                        id="userQuery" 
+                        class="query-input" 
+                        placeholder="e.g., 'I want a reliable car under $10,000' or 'cheap laptop for coding under $500'"
+                        rows="3"
+                    ></textarea>
+                    <button id="generateBtn" class="generate-btn">
+                        <i class="fas fa-magic"></i>
+                        Generate Link
+                    </button>
+                </div>
+
+                                    <div class="examples">
+                        <h3>Try these examples:</h3>
+                        <div class="example-tags">
+                            <span class="example-tag" data-example="I want a reliable car under $10,000">Reliable car under $10k</span>
+                            <span class="example-tag" data-example="cheap laptop for coding under $500">Coding laptop under $500</span>
+                            <span class="example-tag" data-example="furniture for small apartment in NYC">NYC apartment furniture</span>
+                            <span class="example-tag" data-example="remote software job in Seattle">Seattle remote jobs</span>
+                            <span class="example-tag" data-example="MacBook Pro within 10 miles of 90210">MacBook near 90210</span>
+                            <span class="example-tag" data-example="apartment under $2000 within 5 miles of 10001">Apartment near 10001</span>
+                            <span class="example-tag" data-example="apple watch in good condition within 20 miles of 90210">Apple watch in good condition near 90210</span>
+                            <span class="example-tag" data-example="iphone 15 pro in good condition within 10 miles of 90210">iPhone 15 pro in good condition near 90210</span>
+                            <span class="example-tag" data-example="ferrari in good condition within 10 miles of 90210">Ferrari in good condition near 90210</span>
+                        </div>
+                    </div>
+            </div>
+
+            <div id="resultCard" class="result-card hidden">
+                <div class="result-header">
+                    <h3>Your Craigslist Search</h3>
+                    <button id="copyBtn" class="copy-btn" title="Copy all links">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                
+                <div class="result-content">
+                    <div class="explanation">
+                        <i class="fas fa-lightbulb"></i>
+                        <p id="explanationText"></p>
+                    </div>
+                    
+                    <div class="search-details">
+                        <h4>Search Details:</h4>
+                        <div id="searchDetails" class="search-details-list"></div>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h4>Recommended items:</h4>
+                        <div id="recommendationsList" class="recommendations-list"></div>
+                    </div>
+                    
+                    <div class="link-section">
+                        <h4>Craigslist Search Links:</h4>
+                        <div id="craigslistLinks" class="craigslist-links-container">
+                            <!-- Individual links will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loadingCard" class="loading-card hidden">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Analyzing your request...</p>
+            </div>
+
+            <div id="errorCard" class="error-card hidden">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Oops! Something went wrong</h3>
+                <p id="errorMessage"></p>
+                <button id="retryBtn" class="retry-btn">Try Again</button>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by Ollama Open Source LLM Mistral 7B • Built with Flask + Python</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
