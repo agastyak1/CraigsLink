@@ -1,4 +1,4 @@
-# AI Craigslist Link Generator Bot
+# CraigsLink - easily surf Craigslist utilizing natural language prompts
 
 An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters.
 
@@ -18,6 +18,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 
 - Python 3.7 or higher
 - Ollama installed locally ([Download here](https://ollama.ai/))
+- Mistral 7B model has been tested as a balance between speed and accuracy; however, higher parameter models may work better depending on your processing power
 
 ### Installation
 
@@ -87,6 +88,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Interactive Elements**: Example tags, loading states, error handling
 - **Accessibility**: ARIA labels, keyboard shortcuts
 - **Responsive Design**: Works on all device sizes
+- **Dark and Light Mode**: Appealing design with light/dark toggles
 
 ### Key Components
 - **Query Processing**: Analyzes user input for intent
@@ -98,7 +100,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 ## 🔧 Configuration
 
 ### Supported Cities
-The application supports major Craigslist regions:
+The application supports major Craigslist regions (and all zip codes) :
 - San Francisco Bay Area (default)
 - New York City
 - Los Angeles
@@ -112,7 +114,7 @@ The application supports major Craigslist regions:
 - Dallas
 - Houston
 
-### Supported Categories
+### Supported Categories - almost all!
 - **cta**: Cars & Trucks
 - **sys**: Computers
 - **fua**: Furniture
@@ -120,37 +122,7 @@ The application supports major Craigslist regions:
 - **rea**: Real Estate
 - **jjj**: Jobs
 - **sss**: General Search
-
-## 🚀 Deployment
-
-### Local Development
-```bash
-python app.py
-```
-
-### Production with Gunicorn
-```bash
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
-```
-
-### Docker (Optional)
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
-```
-
-## 🔒 Security Notes
-
-- **API Keys**: Never commit your `.env` file to version control
-- **Rate Limiting**: Consider implementing rate limiting for production use
-- **Input Validation**: All user inputs are sanitized and validated
-
-## 🧪 Testing
+- Almost ALL categories in Craigslist are supported - the above are just some common/general ones.
 
 ### Manual Testing
 1. Start the application
@@ -164,25 +136,6 @@ curl -X POST http://localhost:5000/api/generate-link \
   -H "Content-Type: application/json" \
   -d '{"query": "reliable car under $10,000"}'
 ```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **OpenAI API Error**
-   - Verify your API key is correct
-   - Check your OpenAI account has sufficient credits
-   - Ensure the API key has proper permissions
-
-2. **Flask Import Errors**
-   - Make sure all dependencies are installed: `pip install -r requirements.txt`
-   - Check Python version compatibility
-
-3. **CORS Issues**
-   - The app includes CORS support, but if you encounter issues, check browser console
-
-4. **Port Already in Use**
-   - Change the port in `app.py` or kill the process using the port
 
 ## 🔮 Future Enhancements
 
@@ -198,17 +151,4 @@ curl -X POST http://localhost:5000/api/generate-link \
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-1. Check the troubleshooting section above
-2. Review the code and documentation
-3. Open an issue on the repository
-
----
-
-**Built with ❤️ using Flask, Ollama Mistral 7B (local, free), and modern web technologies**
+**Built using Flask, Ollama Mistral 7B (local, free), Python, JS, and HTML/CSS**
