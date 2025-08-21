@@ -12,15 +12,19 @@ const copyBtn = document.getElementById('copyBtn');
 const errorMessage = document.getElementById('errorMessage');
 const retryBtn = document.getElementById('retryBtn');
 const exampleTags = document.querySelectorAll('.example-tag');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
 
 // State
 let currentQuery = '';
+let currentTheme = localStorage.getItem('theme') || 'light';
 
 // Event listeners
 generateBtn.addEventListener('click', handleGenerateClick);
 userQueryInput.addEventListener('keydown', handleKeyDown);
 copyBtn.addEventListener('click', handleCopyClick);
 retryBtn.addEventListener('click', handleRetryClick);
+themeToggle.addEventListener('click', toggleTheme);
 
 // Example tag click handlers
 exampleTags.forEach(tag => {
@@ -302,8 +306,31 @@ function formatPrice(price) {
     }).format(price);
 }
 
+// Theme management
+function toggleTheme() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('theme', currentTheme);
+    applyTheme();
+}
+
+function applyTheme() {
+    document.body.className = currentTheme;
+    
+    // Update icon
+    if (currentTheme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeToggle.title = 'Switch to light theme';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+        themeToggle.title = 'Switch to dark theme';
+    }
+}
+
 // Add some visual polish - focus input on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply saved theme
+    applyTheme();
+    
     userQueryInput.focus();
     
     // Add subtle animation to the search card

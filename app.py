@@ -40,23 +40,110 @@ CITY_MAPPING = {
 
 # Category mapping for common searches
 CATEGORY_MAPPING = {
+    # Vehicles
     "car": "cta",  # cars & trucks
     "vehicle": "cta",
     "automobile": "cta",
+    "truck": "cta",
+    "motorcycle": "mca",  # motorcycles
+    "boat": "boa",  # boats
+    "rv": "rva",  # RVs
+    
+    # Electronics & Computers
     "laptop": "sys",  # computers
     "computer": "sys",
     "desktop": "sys",
+    "iphone": "moa",  # mobile phones
+    "phone": "moa",
+    "mobile": "moa",
+    "smartphone": "moa",
+    "android": "moa",
+    "apple": "moa",
+    "ipad": "moa",
+    "tablet": "moa",
+    "watch": "jwa",  # jewelry & watches
+    "apple watch": "jwa",
+    "headphones": "ele",  # electronics
+    "camera": "ele",
+    "tv": "ele",
+    "television": "ele",
+    "gaming": "ele",
+    "xbox": "ele",
+    "playstation": "ele",
+    "nintendo": "ele",
+    
+    # Furniture & Home
     "furniture": "fua",  # furniture
     "couch": "fua",
+    "sofa": "fua",
     "table": "fua",
     "chair": "fua",
+    "bed": "fua",
+    "mattress": "fua",
+    "dresser": "fua",
+    "kitchen": "fua",
+    "appliance": "fua",
+    "refrigerator": "fua",
+    "washer": "fua",
+    "dryer": "fua",
+    
+    # Housing
     "apartment": "apa",  # apartments
     "rental": "apa",
     "house": "rea",  # real estate
     "home": "rea",
+    "condo": "rea",
+    "townhouse": "rea",
+    "room": "roo",  # rooms
+    "sublet": "roo",
+    
+    # Jobs
     "job": "jjj",  # jobs
     "employment": "jjj",
-    "work": "jjj"
+    "work": "jjj",
+    "career": "jjj",
+    "position": "jjj",
+    
+    # Services
+    "service": "sks",  # skilled trades
+    "repair": "sks",
+    "cleaning": "sks",
+    "plumbing": "sks",
+    "electrical": "sks",
+    
+    # Community
+    "event": "com",  # community
+    "activity": "com",
+    "group": "com",
+    "volunteer": "com",
+    
+    # For Sale
+    "clothing": "cla",  # clothing
+    "shoes": "cla",
+    "jewelry": "jwa",
+    "books": "bks",  # books
+    "music": "msg",  # musical instruments
+    "guitar": "msg",
+    "piano": "msg",
+    "bike": "bia",  # bicycles
+    "bicycle": "bia",
+    "sports": "spo",  # sporting goods
+    "fitness": "spo",
+    "exercise": "spo",
+    "outdoor": "spo",
+    "camping": "spo",
+    
+    # Pets
+    "pet": "pet",  # pets
+    "dog": "pet",
+    "cat": "pet",
+    "puppy": "pet",
+    "kitten": "pet",
+    
+    # General
+    "general": "sss",  # general for sale
+    "misc": "sss",
+    "other": "sss"
 }
 
 def extract_city_from_query(query):
@@ -70,9 +157,52 @@ def extract_city_from_query(query):
 def extract_category_from_query(query):
     """Extract category from user query if mentioned"""
     query_lower = query.lower()
+    
+    # Priority-based category detection (most specific first)
+    priority_categories = [
+        # Mobile devices (highest priority to avoid misclassification)
+        ("iphone", "moa"), ("android", "moa"), ("smartphone", "moa"), ("mobile", "moa"),
+        ("apple watch", "moa"), ("watch", "jwa"),
+        
+        # Electronics
+        ("tv", "ele"), ("television", "ele"), ("camera", "ele"), ("gaming", "ele"),
+        ("xbox", "ele"), ("playstation", "ele"), ("nintendo", "ele"), ("headphones", "ele"),
+        
+        # Computers
+        ("laptop", "sys"), ("computer", "sys"), ("desktop", "sys"),
+        
+        # Vehicles
+        ("car", "cta"), ("vehicle", "cta"), ("automobile", "cta"), ("truck", "cta"),
+        ("motorcycle", "mca"), ("boat", "boa"), ("rv", "rva"),
+        
+        # Housing
+        ("apartment", "apa"), ("rental", "apa"), ("house", "rea"), ("home", "rea"),
+        ("condo", "rea"), ("room", "roo"), ("sublet", "roo"),
+        
+        # Furniture & Appliances
+        ("furniture", "fua"), ("couch", "fua"), ("sofa", "fua"), ("table", "fua"),
+        ("chair", "fua"), ("bed", "fua"), ("appliance", "fua"),
+        
+        # Jobs & Services
+        ("job", "jjj"), ("employment", "jjj"), ("work", "jjj"), ("service", "sks"),
+        ("repair", "sks"), ("cleaning", "sks"),
+        
+        # Other categories
+        ("clothing", "cla"), ("shoes", "cla"), ("jewelry", "jwa"), ("books", "bks"),
+        ("music", "msg"), ("guitar", "msg"), ("bike", "bia"), ("bicycle", "bia"),
+        ("sports", "spo"), ("fitness", "spo"), ("pet", "pet"), ("dog", "pet"), ("cat", "pet")
+    ]
+    
+    # Check priority categories first
+    for category_name, category_code in priority_categories:
+        if category_name in query_lower:
+            return category_code
+    
+    # Fallback to full mapping
     for category_name, category_code in CATEGORY_MAPPING.items():
         if category_name in query_lower:
             return category_code
+    
     return None
 
 def extract_zip_code_from_query(query):
@@ -157,10 +287,38 @@ def generate_link():
         radius = extract_radius_from_query(user_query)
         
         # Prepare prompt for Ollama Mistral 7B
-        system_prompt = """Extract from user request: 3-5 specific item recommendations, price range (min/max), and Craigslist category. Return JSON only:
-        {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
-        
-        Categories: cta (cars), sys (computers), fua (furniture), apa (apartments), rea (real estate), jjj (jobs), sss (general search)"""
+        system_prompt = """You are an expert Craigslist searcher with deep knowledge of Craigslist categories and search optimization. 
+
+Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
+{"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
+
+CRITICAL: Choose the MOST SPECIFIC and ACCURATE category. Do NOT default to general categories unless absolutely necessary.
+
+Craigslist Categories (use the most specific one):
+- cta: Cars & trucks, vehicles, automotive
+- mca: Motorcycles, scooters, ATVs
+- boa: Boats, watercraft, marine
+- rva: RVs, campers, trailers
+- sys: Computers, laptops, desktops, tech
+- moa: Mobile phones, smartphones, tablets, mobile devices, smartwatches, apple watches
+- jwa: Jewelry, watches, luxury items
+- ele: Electronics, TVs, cameras, gaming, audio
+- fua: Furniture, home goods, appliances
+- apa: Apartments, rentals, housing
+- rea: Real estate, houses, condos, land
+- roo: Rooms, sublets, shared housing
+- jjj: Jobs, employment, careers
+- sks: Skilled trades, services, repairs
+- com: Community, events, activities
+- cla: Clothing, shoes, fashion
+- bks: Books, media, literature
+- msg: Musical instruments, equipment
+- bia: Bicycles, bikes, cycling
+- spo: Sports, fitness, outdoor, recreation
+- pet: Pets, animals, livestock
+- sss: General for sale (ONLY if no specific category fits)
+
+IMPORTANT: Mobile devices (iPhone, Android, etc.) go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be precise with categories."""
         
         user_prompt = f"User request: {user_query}"
         

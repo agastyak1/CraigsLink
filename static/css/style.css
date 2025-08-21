@@ -1,3 +1,41 @@
+/* CSS Variables for theming */
+:root {
+    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --text-primary: #333333;
+    --text-secondary: #6c757d;
+    --text-tertiary: #495057;
+    --border-color: #e1e5e9;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    --card-bg: #ffffff;
+    --input-bg: #f8f9fa;
+    --button-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --button-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    --accent-color: #667eea;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+}
+
+/* Dark theme variables */
+body.dark {
+    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --bg-secondary: #0f3460;
+    --bg-tertiary: #16213e;
+    --text-primary: #ffffff;
+    --text-secondary: #b8c5d6;
+    --text-tertiary: #a8b5c6;
+    --border-color: #2d3748;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    --card-bg: #0f3460;
+    --input-bg: #16213e;
+    --button-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --button-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    --accent-color: #667eea;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+}
+
 /* Reset and base styles */
 * {
     margin: 0;
@@ -7,10 +45,11 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-primary);
     min-height: 100vh;
-    color: #333;
+    color: var(--text-primary);
     line-height: 1.6;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -27,6 +66,44 @@ body {
     text-align: center;
     margin-bottom: 40px;
     color: white;
+    position: relative;
+}
+
+.header-top {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 16px;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.95);
 }
 
 .title {
@@ -60,11 +137,12 @@ body {
 
 /* Search card */
 .search-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 32px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
 }
 
 .input-group {
@@ -77,24 +155,25 @@ body {
 .query-input {
     width: 100%;
     padding: 20px;
-    border: 2px solid #e1e5e9;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 16px;
     font-family: inherit;
     resize: vertical;
     transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .query-input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
+    border-color: var(--accent-color);
+    background: var(--card-bg);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .generate-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--button-primary);
     color: white;
     border: none;
     padding: 16px 32px;
@@ -113,6 +192,7 @@ body {
 .generate-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    background: var(--button-hover);
 }
 
 .generate-btn:active {
@@ -130,7 +210,7 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 16px;
-    color: #6c757d;
+    color: var(--text-secondary);
 }
 
 .example-tags {
@@ -140,30 +220,31 @@ body {
 }
 
 .example-tag {
-    background: #f8f9fa;
-    border: 1px solid #e1e5e9;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 8px 16px;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: #6c757d;
+    color: var(--text-secondary);
 }
 
 .example-tag:hover {
-    background: #667eea;
+    background: var(--accent-color);
     color: white;
-    border-color: #667eea;
+    border-color: var(--accent-color);
     transform: translateY(-1px);
 }
 
 /* Result card */
 .result-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 32px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     animation: slideUp 0.5s ease;
+    border: 1px solid var(--border-color);
 }
 
 .result-header {
@@ -172,29 +253,29 @@ body {
     align-items: center;
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .result-header h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .copy-btn {
-    background: #f8f9fa;
-    border: 1px solid #e1e5e9;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: #6c757d;
+    color: var(--text-secondary);
 }
 
 .copy-btn:hover {
-    background: #667eea;
+    background: var(--accent-color);
     color: white;
-    border-color: #667eea;
+    border-color: var(--accent-color);
 }
 
 .result-content {
@@ -208,9 +289,9 @@ body {
     align-items: flex-start;
     gap: 16px;
     padding: 20px;
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     border-radius: 12px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--accent-color);
 }
 
 .explanation i {
@@ -222,14 +303,14 @@ body {
 .explanation p {
     margin: 0;
     font-size: 1rem;
-    color: #495057;
+    color: var(--text-tertiary);
 }
 
 .search-details h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 16px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .search-details-list {
@@ -240,19 +321,20 @@ body {
 }
 
 .search-detail-item {
-    background: #e8f5e8;
-    color: #2e7d32;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 14px;
     font-weight: 500;
+    border: 1px solid var(--border-color);
 }
 
 .recommendations h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 16px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .recommendations-list {
@@ -262,12 +344,13 @@ body {
 }
 
 .recommendation-item {
-    background: #e3f2fd;
-    color: #1976d2;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 14px;
     font-weight: 500;
+    border: 1px solid var(--border-color);
 }
 
 .link-section {
@@ -278,7 +361,7 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 20px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .craigslist-links-container {
@@ -318,18 +401,20 @@ body {
 
 .no-links {
     padding: 20px;
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     border-radius: 12px;
-    border: 1px solid #e1e5e9;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
 }
 
 /* Loading card */
 .loading-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 48px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
 .loading-spinner {
@@ -343,17 +428,18 @@ body {
 
 .loading-card p {
     font-size: 1.1rem;
-    color: #6c757d;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 /* Error card */
 .error-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
     padding: 48px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
 .error-icon {
@@ -369,12 +455,12 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 16px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .error-card p {
     font-size: 1rem;
-    color: #6c757d;
+    color: var(--text-secondary);
     margin-bottom: 24px;
 }
 

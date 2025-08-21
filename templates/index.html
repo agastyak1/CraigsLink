@@ -11,11 +11,18 @@
 <body>
     <div class="container">
         <header class="header">
+            <div class="header-top">
+                <div class="theme-toggle">
+                    <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
             <h1 class="title">
                 <i class="fas fa-robot"></i>
-                Craigslink - Find what you're looking for on Craigslist
+                CraigsLink - Find what you're looking for on Craigslist easily!
             </h1>
-            <p class="subtitle">Describe what you're looking for, and we'll generate the perfect Craigslist search link!</p>
+            <p class="subtitle">Describe what you're looking for, and we'll generate the perfect Craigslist search link for you! Make sure to use specific price ranges, and specific locations via your ZIP code.</p>
         </header>
 
         <main class="main">
@@ -41,10 +48,11 @@
                             <span class="example-tag" data-example="furniture for small apartment in NYC">NYC apartment furniture</span>
                             <span class="example-tag" data-example="remote software job in Seattle">Seattle remote jobs</span>
                             <span class="example-tag" data-example="MacBook Pro within 10 miles of 90210">MacBook near 90210</span>
-                            <span class="example-tag" data-example="apartment under $2000 within 5 miles of 10001">Apartment near 10001</span>
+                            <span class="example-tag" data-example="apartment under $2000 within 5 miles of 10001">Apartment near 90210</span>
                             <span class="example-tag" data-example="apple watch in good condition within 20 miles of 90210">Apple watch in good condition near 90210</span>
-                            <span class="example-tag" data-example="iphone 15 pro in good condition within 10 miles of 90210">iPhone 15 pro in good condition near 90210</span>
+                            <span class="example-tag" data-example="iphone 15 pro in good condition within 10 miles of 90210">iPhone 15 Pro within 30 miles of 90210</span>
                             <span class="example-tag" data-example="ferrari in good condition within 10 miles of 90210">Ferrari in good condition near 90210</span>
+                            <span class="example-tag" data-example="bmw m340i in good condition within 10 miles of 90210">BMW M340i in good condition near 90210</span>
                         </div>
                     </div>
             </div>
@@ -86,7 +94,7 @@
                 <div class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
                 </div>
-                <p>Analyzing your request...</p>
+                <p>Analyzing your request, please wait...</p>
             </div>
 
             <div id="errorCard" class="error-card hidden">
@@ -100,7 +108,7 @@
         </main>
 
         <footer class="footer">
-            <p>Powered by Ollama Open Source LLM Mistral 7B • Built with Flask + Python</p>
+            <p>©️ 2025 Craigslink by Agastya Kumar • Powered by Ollama - Open Source LLM Mistral 7B • Built with Flask, HTML, CSS, JS, and Python</p>
         </footer>
     </div>
 
