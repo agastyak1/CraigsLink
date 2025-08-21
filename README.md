@@ -1,6 +1,6 @@
 # AI Craigslist Link Generator Bot
 
-An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters.
+An intelligent web application that uses local running models provided by Ollama (tested via Mistral 7b) to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters.
 
 ## ✨ Features
 
@@ -98,7 +98,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 ## 🔧 Configuration
 
 ### Supported Cities
-The application supports major Craigslist regions:
+The application supports major Craigslist regions and all valid zip codes within CraigsList:
 - San Francisco Bay Area (default)
 - New York City
 - Los Angeles
@@ -165,24 +165,6 @@ curl -X POST http://localhost:5000/api/generate-link \
   -d '{"query": "reliable car under $10,000"}'
 ```
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **OpenAI API Error**
-   - Verify your API key is correct
-   - Check your OpenAI account has sufficient credits
-   - Ensure the API key has proper permissions
-
-2. **Flask Import Errors**
-   - Make sure all dependencies are installed: `pip install -r requirements.txt`
-   - Check Python version compatibility
-
-3. **CORS Issues**
-   - The app includes CORS support, but if you encounter issues, check browser console
-
-4. **Port Already in Use**
-   - Change the port in `app.py` or kill the process using the port
 
 ## 🔮 Future Enhancements
 
@@ -198,17 +180,4 @@ curl -X POST http://localhost:5000/api/generate-link \
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-1. Check the troubleshooting section above
-2. Review the code and documentation
-3. Open an issue on the repository
-
----
-
-**Built with ❤️ using Flask, Ollama Mistral 7B (local, free), and modern web technologies**
+**Built using Flask, Ollama Mistral 7B (local, free), and modern web technologies**
