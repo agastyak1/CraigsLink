@@ -292,7 +292,7 @@ def generate_link():
 Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
 {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
 
-CRITICAL: Choose the MOST SPECIFIC and ACCURATE category. Do NOT default to general categories unless absolutely necessary.
+CRITICAL: Choose the MOST SPECIFIC and ACCURATE category. Do NOT default to general categories unless absolutely necessary. ANY car brand and/or modelmentioned should be in the CTA category.
 
 Craigslist Categories (use the most specific one):
 - cta: Cars & trucks, vehicles, automotive
