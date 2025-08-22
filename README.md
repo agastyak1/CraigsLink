@@ -2,7 +2,7 @@
 
 An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters.
 
-## ✨ Features
+## Features
 
 - **Natural Language Processing**: Describe what you want in plain English
 - **AI-Powered Recommendations**: Ollama Mistral 7B (local, free) suggests relevant items and brands
@@ -12,7 +12,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Modern UI**: Clean, responsive design with smooth animations
 - **Example Queries**: Click-to-try example searches
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -52,7 +52,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 5. **Open your browser**
    Navigate to `http://localhost:5000`
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Car Search
 **Input**: "I want a reliable car under $10,000"
@@ -75,7 +75,7 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Recommendations**: IKEA furniture, compact sofa, small dining table
 - **Link**: `https://nyc.craigslist.org/search/fua?query=ikea+furniture|compact+sofa|small+dining+table`
 
-## 🏗️ Architecture
+## Architecture
 
 ### Backend (Python/Flask)
 - **Flask**: Web framework for API endpoints
