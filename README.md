@@ -1,6 +1,6 @@
 # CraigsLink - easily surf Craigslist utilizing natural language prompts
 
-An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters.
+An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
 
 ## Features
 
@@ -11,7 +11,11 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Price Filtering**: Automatically extracts and applies price ranges
 - **Modern UI**: Clean, responsive design with smooth animations
 - **Example Queries**: Click-to-try example searches
-
+## Application Examples
+![CraigsLink Dark](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkDark.png)
+![CraigsLink Light](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkLight.png)
+![CraigsLink Processing](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkProcessing.png)
+![CraigsLink Results](https://github.com/agastyak1/CraigsLink/blob/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkResults.png?raw=true)
 ## Quick Start
 
 ### Prerequisites
