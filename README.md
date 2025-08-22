@@ -157,6 +157,6 @@ curl -X POST http://localhost:5000/api/generate-link \
 
 ## 📝 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project under the [GNU Affero General Public License v3.0](LICENSE).
 
 **Built using Flask, Ollama Mistral 7B (local, free), Python, JS, and HTML/CSS**
