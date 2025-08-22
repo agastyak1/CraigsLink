@@ -62,7 +62,7 @@ CATEGORY_MAPPING = {
     "ipad": "moa",
     "tablet": "moa",
     "watch": "jwa",  # jewelry & watches
-    "apple watch": "jwa",
+    "apple watch": "ele",
     "headphones": "ele",  # electronics
     "camera": "ele",
     "tv": "ele",
@@ -162,7 +162,7 @@ def extract_category_from_query(query):
     priority_categories = [
         # Mobile devices (highest priority to avoid misclassification)
         ("iphone", "moa"), ("android", "moa"), ("smartphone", "moa"), ("mobile", "moa"),
-        ("apple watch", "moa"), ("watch", "jwa"),
+        ("apple watch", "ele"), ("watch", "jwa"),
         
         # Electronics
         ("tv", "ele"), ("television", "ele"), ("camera", "ele"), ("gaming", "ele"),
@@ -239,6 +239,110 @@ def extract_radius_from_query(query):
     
     return None
 
+def extract_partial_response(ai_response, fallback_category):
+    """Intelligently extract information from AI response when JSON parsing fails"""
+    import re
+    
+    # Initialize with fallback values
+    result = {
+        "recommendations": [],
+        "min_price": None,
+        "max_price": None,
+        "category": fallback_category or "sss",
+        "explanation": ai_response
+    }
+    
+    # Try to extract recommendations from the response text
+    # Look for patterns like "recommended monitors are:", "items:", etc.
+    recommendation_patterns = [
+        r'recommendations?[:\s]+([^.]+)',
+        r'items?[:\s]+([^.]+)',
+        r'suggested[:\s]+([^.]+)',
+        r'popular[:\s]+([^.]+)',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*\s+(?:monitor|tv|laptop|car|phone|furniture|apartment|house|job))',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*\s+[A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*)'
+    ]
+    
+    for pattern in recommendation_patterns:
+        matches = re.findall(pattern, ai_response, re.IGNORECASE)
+        if matches:
+            # Clean up the matches and extract individual items
+            for match in matches:
+                # Split by common separators
+                items = re.split(r'[,|;]|\sand\s', match.strip())
+                for item in items:
+                    item = item.strip()
+                    if item and len(item) > 2 and item not in result["recommendations"]:
+                        result["recommendations"].append(item)
+            
+            if result["recommendations"]:
+                break
+    
+    # If no recommendations found, try to extract from the explanation
+    if not result["recommendations"]:
+        # Look for brand names and product types
+        brand_patterns = [
+            r'([A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*\s+(?:monitor|tv|laptop|car|phone|furniture|apartment|house|job))',
+            r'([A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*\s+[A-Z][a-z]+(?:\s+[A-Z][a-z0-9]+)*)'
+        ]
+        
+        for pattern in brand_patterns:
+            matches = re.findall(pattern, ai_response)
+            if matches:
+                for match in matches:
+                    if match and len(match) > 2 and match not in result["recommendations"]:
+                        result["recommendations"].append(match)
+                break
+    
+    # Extract price information
+    price_patterns = [
+        r'under\s+\$?(\d+)',
+        r'less\s+than\s+\$?(\d+)',
+        r'max\s+price[:\s]+\$?(\d+)',
+        r'maximum\s+price[:\s]+\$?(\d+)',
+        r'budget[:\s]+\$?(\d+)',
+        r'(\d+)\s+dollars?',
+        r'\$(\d+)'
+    ]
+    
+    for pattern in price_patterns:
+        match = re.search(pattern, ai_response, re.IGNORECASE)
+        if match:
+            price = int(match.group(1))
+            if result["max_price"] is None or price < result["max_price"]:
+                result["max_price"] = price
+            break
+    
+    # Extract minimum price if mentioned
+    min_price_patterns = [
+        r'over\s+\$?(\d+)',
+        r'more\s+than\s+\$?(\d+)',
+        r'min\s+price[:\s]+\$?(\d+)',
+        r'minimum\s+price[:\s]+\$?(\d+)',
+        r'starting\s+at\s+\$?(\d+)'
+    ]
+    
+    for pattern in min_price_patterns:
+        match = re.search(pattern, ai_response, re.IGNORECASE)
+        if match:
+            result["min_price"] = int(match.group(1))
+            break
+    
+    # If still no recommendations, provide generic ones based on category
+    if not result["recommendations"]:
+        if fallback_category == "sys":
+            result["recommendations"] = ["Computer", "Laptop", "Monitor", "Desktop", "Tablet"]
+        elif fallback_category == "cta":
+            result["recommendations"] = ["Car", "Truck", "SUV", "Sedan", "Vehicle"]
+        elif fallback_category == "fua":
+            result["recommendations"] = ["Furniture", "Couch", "Table", "Chair", "Bed"]
+        elif fallback_category == "apa":
+            result["recommendations"] = ["Apartment", "Studio", "1BR", "2BR", "Rental"]
+        else:
+            result["recommendations"] = ["Item", "Product", "Service", "Goods"]
+    
+    return result
+
 def generate_craigslist_link(keywords, city, category, min_price=None, max_price=None, zip_code=None, radius=None):
     """Generate a Craigslist search URL with zip code and radius support"""
     # Clean and format keywords
@@ -287,22 +391,22 @@ def generate_link():
         radius = extract_radius_from_query(user_query)
         
         # Prepare prompt for Ollama Mistral 7B
-        system_prompt = """You are an expert Craigslist searcher with deep knowledge of Craigslist categories and search optimization. 
+        system_prompt = """You are an expert Craigslist searcher. Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
 
-Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
 {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
-
-CRITICAL: Choose the MOST SPECIFIC and ACCURATE category. Do NOT default to general categories unless absolutely necessary. ANY car brand and/or modelmentioned should be in the CTA category.
-
-Craigslist Categories (use the most specific one):
+CRITICAL: Do not include search terms like "refurbished","used" or "second hand" in the search query.
+CRITICAL: ABSOLUTELY NO UNDERSCORES IN THE SEARCH QUERY.
+CRITICAL: Choose the MOST SPECIFIC category. Do NOT default to general categories. Do NOT provide underscores within the search query (example: do NOT write "software_jobs," instead write "software jobs").
+CRITICAL: Laptops, desktops, computers, and tech go in 'sys', NOT 'ele'.
+ABSOLUTELY NO UNDERSCORES IN THE SEARCH QUERY.
 - cta: Cars & trucks, vehicles, automotive
 - mca: Motorcycles, scooters, ATVs
 - boa: Boats, watercraft, marine
 - rva: RVs, campers, trailers
 - sys: Computers, laptops, desktops, tech
-- moa: Mobile phones, smartphones, tablets, mobile devices, smartwatches, apple watches
+- moa: Mobile phones, smartphones, tablets
 - jwa: Jewelry, watches, luxury items
-- ele: Electronics, TVs, cameras, gaming, audio
+- ele: Electronics, smartwatches, TVs, cameras, gaming, audio
 - fua: Furniture, home goods, appliances
 - apa: Apartments, rentals, housing
 - rea: Real estate, houses, condos, land
@@ -318,7 +422,7 @@ Craigslist Categories (use the most specific one):
 - pet: Pets, animals, livestock
 - sss: General for sale (ONLY if no specific category fits)
 
-IMPORTANT: Mobile devices (iPhone, Android, etc.) go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be precise with categories."""
+IMPORTANT: Mobile devices go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be precise."""
         
         user_prompt = f"User request: {user_query}"
         
@@ -332,8 +436,8 @@ IMPORTANT: Mobile devices (iPhone, Android, etc.) go in 'moa', NOT 'cta'. Electr
             "stream": False,
             "options": {
                 "temperature": 0.1,
-                "num_predict": 150,  # Reduced for faster responses
-                "top_k": 10,         # Limit token selection for speed
+                "num_predict": 1000,  # Increased for complete responses
+                "top_k": 15,         # Limit token selection for speed
                 "top_p": 0.9,        # Nucleus sampling for efficiency
                 "repeat_penalty": 1.1 # Prevent repetitive responses
             }
@@ -350,6 +454,10 @@ IMPORTANT: Mobile devices (iPhone, Android, etc.) go in 'moa', NOT 'cta'. Electr
             # Parse Ollama response
             ai_response = response.json()['message']['content'].strip()
             
+            # Log the response for debugging (remove in production)
+            print(f"Ollama response length: {len(ai_response)}")
+            print(f"Ollama response preview: {ai_response[:200]}...")
+            
         except requests.exceptions.Timeout:
             raise Exception("Request timed out. Ollama model is still processing. Try again in a moment.")
         except requests.exceptions.RequestException as e:
@@ -357,31 +465,34 @@ IMPORTANT: Mobile devices (iPhone, Android, etc.) go in 'moa', NOT 'cta'. Electr
         except KeyError as e:
             raise Exception(f"Invalid response from Ollama: {str(e)}")
         
-        # Try to extract JSON from response
+        # Try to extract JSON from response with improved parsing
         try:
-            # Find JSON in the response
-            json_match = re.search(r'\{.*\}', ai_response, re.DOTALL)
+            # First, try to find complete JSON in the response
+            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', ai_response, re.DOTALL)
             if json_match:
-                import json
-                parsed_response = json.loads(json_match.group())
+                try:
+                    parsed_response = json.loads(json_match.group())
+                except json.JSONDecodeError:
+                    # Try to fix common JSON issues
+                    fixed_json = json_match.group()
+                    # Remove trailing incomplete text
+                    if fixed_json.count('{') > fixed_json.count('}'):
+                        # Find the last complete object
+                        last_brace = fixed_json.rfind('}')
+                        if last_brace > 0:
+                            fixed_json = fixed_json[:last_brace + 1]
+                    
+                    try:
+                        parsed_response = json.loads(fixed_json)
+                    except json.JSONDecodeError:
+                        raise Exception("JSON parsing failed after cleanup")
             else:
-                # Fallback parsing
-                parsed_response = {
-                    "recommendations": ["item1", "item2", "item3"],
-                    "min_price": None,
-                    "max_price": None,
-                    "category": category or "sss",
-                    "explanation": ai_response
-                }
-        except:
-            # Fallback if JSON parsing fails
-            parsed_response = {
-                "recommendations": ["item1", "item2", "item3"],
-                "min_price": None,
-                "max_price": None,
-                "category": category or "sss",
-                "explanation": ai_response
-            }
+                # Try to extract partial information from the response
+                parsed_response = extract_partial_response(ai_response, category)
+                
+        except Exception as e:
+            # Intelligent fallback based on the actual response content
+            parsed_response = extract_partial_response(ai_response, category)
         
         # Generate individual Craigslist links for each recommendation
         recommendations = parsed_response.get("recommendations", [])
