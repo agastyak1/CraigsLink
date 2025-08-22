@@ -17,9 +17,9 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - Light mode example
 ![CraigsLink Light](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkLight.png)
 - LLM processing example
-![CraigsLink Processing](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkProcessing.png)
+![CraigsLink Processing](https://github.com/agastyak1/CraigsLink/raw/a09bbcebb108fe7ee9964eae355098917186790c/craigsLinkResults/craigsLinkProcessing2.png)
 - Results example
-![CraigsLink Results](https://github.com/agastyak1/CraigsLink/blob/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkResults.png?raw=true)
+![CraigsLink Results 2](https://github.com/agastyak1/CraigsLink/blob/a09bbcebb108fe7ee9964eae355098917186790c/craigsLinkResults/craigsLinkResults2.png?raw=true)
 ## Quick Start
 
 ### Prerequisites
