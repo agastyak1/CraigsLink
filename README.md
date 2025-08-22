@@ -12,9 +12,13 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Modern UI**: Clean, responsive design with smooth animations
 - **Example Queries**: Click-to-try example searches
 ## Application Examples
+- Dark mode example
 ![CraigsLink Dark](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkDark.png)
+- Light mode example
 ![CraigsLink Light](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkLight.png)
+- LLM processing example
 ![CraigsLink Processing](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkProcessing.png)
+- Results example
 ![CraigsLink Results](https://github.com/agastyak1/CraigsLink/blob/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkResults.png?raw=true)
 ## Quick Start
 
