@@ -145,16 +145,6 @@ curl -X POST http://localhost:5000/api/generate-link \
   -d '{"query": "reliable car under $10,000"}'
 ```
 
-## 🔮 Future Enhancements
-
-- [ ] **City Selection Dropdown**: User-selectable city/region
-- [ ] **IP Geolocation**: Auto-detect user's city
-- [ ] **Multiple Marketplaces**: Support for Facebook Marketplace, OfferUp
-- [ ] **User Accounts**: Save and manage search history
-- [ ] **Browser Extension**: Chrome/Firefox extension version
-- [ ] **Advanced Filters**: Condition, mileage, year ranges
-- [ ] **Search Analytics**: Track popular searches and trends
-
 ## 📝 License
 
 This project under the [GNU Affero General Public License v3.0](LICENSE).
