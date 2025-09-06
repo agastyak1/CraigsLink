@@ -206,13 +206,32 @@ def extract_category_from_query(query):
     return None
 
 def extract_zip_code_from_query(query):
-    """Extract zip code from user query"""
+    """Extract zip code from user query with context awareness"""
     import re
-    # Look for 5-digit zip codes
-    zip_pattern = r'\b\d{5}\b'
-    zip_match = re.search(zip_pattern, query)
-    if zip_match:
-        return zip_match.group()
+    query_lower = query.lower()
+    
+    # Look for zip codes in specific contexts to avoid confusion with prices
+    zip_patterns = [
+        # "within X miles of 90210" - most specific
+        r'within\s+\d+\s+miles?\s+of\s+(\d{5})',
+        # "near 90210" or "around 90210"
+        r'(?:near|around|in|at)\s+(\d{5})',
+        # "zip code 90210" or "postal code 90210"
+        r'(?:zip\s+code|postal\s+code)\s+(\d{5})',
+        # "90210 area" or "90210 region"
+        r'(\d{5})\s+(?:area|region|zone)',
+        # General 5-digit pattern but validate it's a reasonable zip code
+        r'\b(\d{5})\b'
+    ]
+    
+    for pattern in zip_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            zip_code = match.group(1)
+            # Validate it's a reasonable US zip code (10000-99999)
+            if 10000 <= int(zip_code) <= 99999:
+                return zip_code
+    
     return None
 
 def extract_radius_from_query(query):
@@ -238,6 +257,231 @@ def extract_radius_from_query(query):
             return int(radius_value)
     
     return None
+
+def extract_price_from_query(query):
+    """Extract price range from user query"""
+    import re
+    query_lower = query.lower()
+    
+    min_price = None
+    max_price = None
+    
+    # Extract maximum price patterns with negative lookahead to avoid mileage confusion
+    max_price_patterns = [
+        r'under\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "under $15000" but not "under 100k miles"
+        r'less\s+than\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "less than $15000" but not "less than 100k miles"
+        r'max\s+price[:\s]+\$?(\d{1,6})',  # "max price: $15000"
+        r'maximum\s+price[:\s]+\$?(\d{1,6})',  # "maximum price: $15000"
+        r'budget[:\s]+\$?(\d{1,6})',  # "budget: $15000"
+        r'(\d{1,6})\s+dollars?(?!\s*per\s*mile)',  # "15000 dollars" but not "100 dollars per mile"
+        r'\$(\d{1,6})',  # "$15000" - dollar sign is clear indicator
+        r'price[:\s]+\$?(\d{1,6})',  # "price: $15000"
+        r'cost[:\s]+\$?(\d{1,6})'  # "cost: $15000"
+    ]
+    
+    for pattern in max_price_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            price = int(match.group(1))
+            # Additional validation: check if this looks like mileage, not price
+            price_text = match.group(0).lower()
+            if 'k' in price_text and ('mile' in price_text or 'mi' in price_text):
+                continue  # Skip this match, it's likely mileage
+            # Validate it's a reasonable price (not a zip code)
+            if 100 <= price <= 999999:  # Reasonable price range
+                max_price = price
+                break
+    
+    # Extract minimum price patterns with negative lookahead to avoid mileage confusion
+    min_price_patterns = [
+        r'over\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "over $10000" but not "over 100k miles"
+        r'more\s+than\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "more than $10000" but not "more than 100k miles"
+        r'min\s+price[:\s]+\$?(\d{1,6})',  # "min price: $10000"
+        r'minimum\s+price[:\s]+\$?(\d{1,6})',  # "minimum price: $10000"
+        r'starting\s+at\s+\$?(\d{1,6})',  # "starting at $10000"
+        r'from\s+\$?(\d{1,6})(?!\s*k?\s*miles?)'  # "from $10000" but not "from 100k miles"
+    ]
+    
+    for pattern in min_price_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            price = int(match.group(1))
+            # Additional validation: check if this looks like mileage, not price
+            price_text = match.group(0).lower()
+            if 'k' in price_text and ('mile' in price_text or 'mi' in price_text):
+                continue  # Skip this match, it's likely mileage
+            # Validate it's a reasonable price (not a zip code)
+            if 100 <= price <= 999999:  # Reasonable price range
+                min_price = price
+                break
+    
+    return min_price, max_price
+
+def extract_vehicle_parameters(query):
+    """Extract vehicle-specific parameters from user query"""
+    import re
+    query_lower = query.lower()
+    
+    params = {
+        'search_titles_only': False,
+        'hide_duplicates': False,
+        'min_year': None,
+        'max_year': None,
+        'min_miles': None,
+        'max_miles': None,
+        'drive_type': None,
+        'transmission': None,
+        'body_type': None,
+        'cylinders': None,
+        'fuel_type': None,
+        'paint_color': None,
+        'title_status': None
+    }
+    
+    # Search titles only
+    if any(phrase in query_lower for phrase in ['title only', 'titles only', 'search titles']):
+        params['search_titles_only'] = True
+    
+    # Hide duplicates
+    if any(phrase in query_lower for phrase in ['hide duplicates', 'no duplicates', 'unique only']):
+        params['hide_duplicates'] = True
+    
+    # Model year range
+    year_patterns = [
+        (r'(\d{4})\s*to\s*(\d{4})', 'range'),  # "2010 to 2015"
+        (r'(\d{4})\s*-\s*(\d{4})', 'range'),   # "2010-2015"
+        (r'after\s*(\d{4})', 'min'),           # "after 2010"
+        (r'before\s*(\d{4})', 'max'),          # "before 2015"
+        (r'from\s*(\d{4})', 'min'),            # "from 2010"
+        (r'(\d{4})\s*or\s*newer', 'min'),      # "2010 or newer"
+        (r'(\d{4})\s*or\s*older', 'max'),      # "2015 or older"
+        (r'(\d{4})s?', 'single')               # "2010s" or "2010"
+    ]
+    
+    for pattern, match_type in year_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            if match_type == 'range':
+                params['min_year'] = int(match.group(1))
+                params['max_year'] = int(match.group(2))
+            elif match_type == 'min':
+                params['min_year'] = int(match.group(1))
+            elif match_type == 'max':
+                params['max_year'] = int(match.group(1))
+            elif match_type == 'single':
+                year = int(match.group(1))
+                if 1990 <= year <= 2025:  # Reasonable year range
+                    params['min_year'] = year
+            break
+    
+    # Mileage range
+    mileage_patterns = [
+        (r'(\d+)\s*to\s*(\d+)\s*miles?', 'range'),     # "50k to 100k miles"
+        (r'(\d+)\s*-\s*(\d+)\s*miles?', 'range'),      # "50k-100k miles"
+        (r'under\s*(\d+)\s*miles?', 'max'),            # "under 100k miles"
+        (r'over\s*(\d+)\s*miles?', 'min'),             # "over 50k miles"
+        (r'less\s+than\s*(\d+)\s*miles?', 'max'),      # "less than 100k miles"
+        (r'more\s+than\s*(\d+)\s*miles?', 'min'),      # "more than 50k miles"
+        (r'(\d+)k\s*miles?', 'single')                 # "75k miles"
+    ]
+    
+    for pattern, match_type in mileage_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            if match_type == 'range':
+                params['min_miles'] = int(match.group(1)) * 1000
+                params['max_miles'] = int(match.group(2)) * 1000
+            elif match_type == 'min':
+                params['min_miles'] = int(match.group(1)) * 1000
+            elif match_type == 'max':
+                params['max_miles'] = int(match.group(1)) * 1000
+            elif match_type == 'single':
+                params['max_miles'] = int(match.group(1)) * 1000
+            break
+    
+    # Drive type
+    drive_mapping = {
+        'fwd': 1, 'front wheel drive': 1, 'front-wheel drive': 1,
+        'rwd': 2, 'rear wheel drive': 2, 'rear-wheel drive': 2,
+        'awd': 3, 'all wheel drive': 3, 'all-wheel drive': 3,
+        '4wd': 4, 'four wheel drive': 4, '4 wheel drive': 4
+    }
+    
+    for term, code in drive_mapping.items():
+        if term in query_lower:
+            params['drive_type'] = code
+            break
+    
+    # Transmission
+    if 'manual' in query_lower and 'automatic' not in query_lower:
+        params['transmission'] = 1
+    elif 'automatic' in query_lower and 'manual' not in query_lower:
+        params['transmission'] = 2
+    
+    # Body type
+    body_mapping = {
+        'sedan': 3, 'suv': 8, 'truck': 1, 'coupe': 2, 'convertible': 4,
+        'wagon': 5, 'hatchback': 6, 'van': 7, 'pickup': 1
+    }
+    
+    for term, code in body_mapping.items():
+        if term in query_lower:
+            params['body_type'] = code
+            break
+    
+    # Cylinders
+    cylinder_patterns = [
+        (r'(\d+)\s*cylinder', 'single'),
+        (r'(\d+)\s*cyl', 'single'),
+        (r'v(\d+)', 'single')
+    ]
+    
+    for pattern, match_type in cylinder_patterns:
+        match = re.search(pattern, query_lower)
+        if match:
+            params['cylinders'] = int(match.group(1))
+            break
+    
+    # Fuel type
+    fuel_mapping = {
+        'gas': 1, 'gasoline': 1, 'petrol': 1,
+        'diesel': 2,
+        'hybrid': 3,
+        'electric': 4, 'ev': 4
+    }
+    
+    for term, code in fuel_mapping.items():
+        if term in query_lower:
+            params['fuel_type'] = code
+            break
+    
+    # Paint color
+    color_mapping = {
+        'black': 1, 'white': 2, 'silver': 3, 'gray': 4, 'grey': 4,
+        'red': 5, 'blue': 6, 'green': 7, 'brown': 8, 'gold': 9,
+        'yellow': 10, 'orange': 11, 'purple': 12, 'pink': 13
+    }
+    
+    for term, code in color_mapping.items():
+        if term in query_lower:
+            params['paint_color'] = code
+            break
+    
+    # Title status
+    title_mapping = {
+        'clean': 1, 'clean title': 1,
+        'salvage': 2, 'salvage title': 2,
+        'rebuilt': 3, 'rebuilt title': 3,
+        'parts only': 4, 'parts': 4,
+        'missing': 5, 'missing title': 5
+    }
+    
+    for term, code in title_mapping.items():
+        if term in query_lower:
+            params['title_status'] = code
+            break
+    
+    return params
 
 def extract_partial_response(ai_response, fallback_category):
     """Intelligently extract information from AI response when JSON parsing fails"""
@@ -294,24 +538,28 @@ def extract_partial_response(ai_response, fallback_category):
                         result["recommendations"].append(match)
                 break
     
-    # Extract price information
-    price_patterns = [
-        r'under\s+\$?(\d+)',
-        r'less\s+than\s+\$?(\d+)',
-        r'max\s+price[:\s]+\$?(\d+)',
-        r'maximum\s+price[:\s]+\$?(\d+)',
-        r'budget[:\s]+\$?(\d+)',
-        r'(\d+)\s+dollars?',
-        r'\$(\d+)'
-    ]
-    
-    for pattern in price_patterns:
-        match = re.search(pattern, ai_response, re.IGNORECASE)
-        if match:
-            price = int(match.group(1))
-            if result["max_price"] is None or price < result["max_price"]:
-                result["max_price"] = price
-            break
+        # Extract price information with better patterns and negative lookahead
+        price_patterns = [
+            r'under\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "under $15000" but not "under 100k miles"
+            r'less\s+than\s+\$?(\d{1,6})(?!\s*k?\s*miles?)',  # "less than $15000" but not "less than 100k miles"
+            r'max\s+price[:\s]+\$?(\d{1,6})',  # "max price: $15000"
+            r'maximum\s+price[:\s]+\$?(\d{1,6})',  # "maximum price: $15000"
+            r'budget[:\s]+\$?(\d{1,6})',  # "budget: $15000"
+            r'(\d{1,6})\s+dollars?(?!\s*per\s*mile)',  # "15000 dollars" but not "100 dollars per mile"
+            r'\$(\d{1,6})',  # "$15000" - dollar sign is clear indicator
+            r'price[:\s]+\$?(\d{1,6})',  # "price: $15000"
+            r'cost[:\s]+\$?(\d{1,6})'  # "cost: $15000"
+        ]
+        
+        for pattern in price_patterns:
+            match = re.search(pattern, ai_response, re.IGNORECASE)
+            if match:
+                price = int(match.group(1))
+                # Validate it's a reasonable price (not a zip code)
+                if 100 <= price <= 999999:  # Reasonable price range
+                    if result["max_price"] is None or price < result["max_price"]:
+                        result["max_price"] = price
+                break
     
     # Extract minimum price if mentioned
     min_price_patterns = [
@@ -343,8 +591,8 @@ def extract_partial_response(ai_response, fallback_category):
     
     return result
 
-def generate_craigslist_link(keywords, city, category, min_price=None, max_price=None, zip_code=None, radius=None):
-    """Generate a Craigslist search URL with zip code and radius support"""
+def generate_craigslist_link(keywords, city, category, min_price=None, max_price=None, zip_code=None, radius=None, vehicle_params=None):
+    """Generate a Craigslist search URL with zip code, radius, and vehicle-specific parameters support"""
     # Clean and format keywords
     formatted_keywords = "|".join([kw.strip().replace(" ", "+") for kw in keywords if kw.strip()])
     
@@ -363,6 +611,39 @@ def generate_craigslist_link(keywords, city, category, min_price=None, max_price
         params.append(f"postal={zip_code}")
     if radius:
         params.append(f"search_distance={radius}")
+    
+    # Add vehicle-specific parameters if provided
+    if vehicle_params:
+        # Search options
+        if vehicle_params.get('search_titles_only'):
+            params.append("srchType=T")
+        if vehicle_params.get('hide_duplicates'):
+            params.append("bundleDuplicates=1")
+        
+        # Vehicle parameters (only for cars & trucks category)
+        if category == 'cta':
+            if vehicle_params.get('min_year'):
+                params.append(f"min_auto_year={vehicle_params['min_year']}")
+            if vehicle_params.get('max_year'):
+                params.append(f"max_auto_year={vehicle_params['max_year']}")
+            if vehicle_params.get('min_miles'):
+                params.append(f"min_auto_miles={vehicle_params['min_miles']}")
+            if vehicle_params.get('max_miles'):
+                params.append(f"max_auto_miles={vehicle_params['max_miles']}")
+            if vehicle_params.get('drive_type'):
+                params.append(f"auto_drivetrain={vehicle_params['drive_type']}")
+            if vehicle_params.get('transmission'):
+                params.append(f"auto_transmission={vehicle_params['transmission']}")
+            if vehicle_params.get('body_type'):
+                params.append(f"auto_bodytype={vehicle_params['body_type']}")
+            if vehicle_params.get('cylinders'):
+                params.append(f"auto_cylinders={vehicle_params['cylinders']}")
+            if vehicle_params.get('fuel_type'):
+                params.append(f"auto_fuel_type={vehicle_params['fuel_type']}")
+            if vehicle_params.get('paint_color'):
+                params.append(f"auto_paint={vehicle_params['paint_color']}")
+            if vehicle_params.get('title_status'):
+                params.append(f"auto_title_status={vehicle_params['title_status']}")
     
     # Combine URL and parameters
     if params:
@@ -384,21 +665,59 @@ def generate_link():
         if not user_query:
             return jsonify({'error': 'Query is required'}), 400
         
-        # Extract city, category, zip code, and radius from query
+        # Extract city, category, zip code, radius, price, and vehicle parameters from query
         city = extract_city_from_query(user_query)
         category = extract_category_from_query(user_query)
         zip_code = extract_zip_code_from_query(user_query)
         radius = extract_radius_from_query(user_query)
+        vehicle_params = extract_vehicle_parameters(user_query)
+        
+        # Extract price information from query
+        min_price, max_price = extract_price_from_query(user_query)
         
         # Prepare prompt for Ollama Mistral 7B
         system_prompt = """You are an expert Craigslist searcher. Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
 
 {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
-CRITICAL: Do not include search terms like "refurbished","used" or "second hand" in the search query.
-CRITICAL: ABSOLUTELY NO UNDERSCORES IN THE SEARCH QUERY.
-CRITICAL: Choose the MOST SPECIFIC category. Do NOT default to general categories. Do NOT provide underscores within the search query (example: do NOT write "software_jobs," instead write "software jobs").
-CRITICAL: Laptops, desktops, computers, and tech go in 'sys', NOT 'ele'.
-ABSOLUTELY NO UNDERSCORES IN THE SEARCH QUERY.
+
+CRITICAL RULES:
+1. Choose the MOST SPECIFIC category. Do NOT default to general categories.
+2. For vehicle searches, ONLY include the core vehicle name/model in recommendations - NOT color, year, mileage, transmission, or title status.
+3. Vehicle-specific details (color, year, mileage, transmission, title status) are handled by URL parameters, not search keywords.
+4. Do not include search terms like "refurbished", "used" or "second hand" in the search query.
+5. ABSOLUTELY NO UNDERSCORES IN THE SEARCH QUERY.
+6. CRITICAL: When extracting prices, be VERY careful to distinguish between:
+   - PRICES: "under $15000", "less than $1000", "$5000"
+   - ZIP CODES: "90210", "10001", "94102"
+   - NEVER confuse prices with zip codes in your analysis!
+7. CRITICAL: If the user DOES NOT specify a price, DO NOT PUT PRICE PARAMETERS IN THE JSON.
+8. CRITICAL: NEVER extract mileage as price. "100k miles" is MILEAGE, not "$100". Only extract prices when there are clear price indicators like "$", "under", "budget", "price", "cost".
+
+EXAMPLES:
+- Query: "black BMW 335i 2010 to 2015 under 100k miles automatic clean title"
+- CORRECT: {"recommendations": ["BMW 335i", "BMW 3 Series", "BMW 335i Sedan"], "category": "cta"}
+- WRONG: {"recommendations": ["black BMW 335i", "2010-2015", "automatic", "clean title"]}
+
+- Query: "Honda Civic 2015 or newer automatic FWD clean title under $15000 within 15 miles of 90210"
+- CORRECT: {"recommendations": ["Honda Civic", "Honda Civic Sedan", "Honda Civic Coupe"], "max_price": 15000, "category": "cta"}
+- WRONG: {"recommendations": ["Honda Civic 2015", "automatic", "FWD", "clean title"], "max_price": 90210}
+
+- Query: "MacBook Pro 13 inch under $1000"
+- CORRECT: {"recommendations": ["MacBook Pro", "MacBook Pro 13", "MacBook Pro 13 inch"], "max_price": 1000, "category": "sys"}
+- WRONG: {"recommendations": ["MacBook Pro 13 inch under $1000"]}
+
+- Query: "BMW 335i 2010 to 2015 under 100k miles automatic clean title"
+- CORRECT: {"recommendations": ["BMW 335i", "BMW 3 Series", "BMW 335i Sedan"], "category": "cta"}
+- WRONG: {"recommendations": ["BMW 335i", "BMW 3 Series"], "max_price": 100, "category": "cta"}
+
+PRICE vs ZIP CODE vs MILEAGE DISTINCTION:
+- PRICES: Look for "$" symbol, "under", "less than", "budget", "price", "cost"
+- ZIP CODES: Look for "within X miles of", "near", "around", "zip code", "postal code"
+- MILEAGE: Look for "k miles", "miles", "mi" - NEVER extract as price
+- NEVER extract a 5-digit number as price if it appears after "miles of" or "near"
+- NEVER extract "100k miles" as "$100" - it's MILEAGE, not PRICE
+
+Key Categories:
 - cta: Cars & trucks, vehicles, automotive
 - mca: Motorcycles, scooters, ATVs
 - boa: Boats, watercraft, marine
@@ -504,10 +823,11 @@ IMPORTANT: Mobile devices go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be pr
                     [item],  # Single item
                     city,
                     parsed_response.get("category", category) or "sss",
-                    parsed_response.get("min_price"),
-                    parsed_response.get("max_price"),
+                    parsed_response.get("min_price") or min_price,  # Use extracted price or AI price
+                    parsed_response.get("max_price") or max_price,  # Use extracted price or AI price
                     zip_code,  # Include zip code
-                    radius     # Include radius
+                    radius,    # Include radius
+                    vehicle_params  # Include vehicle parameters
                 )
                 craigslist_links.append({
                     "item": item,
@@ -526,7 +846,8 @@ IMPORTANT: Mobile devices go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be pr
             "min_price": parsed_response.get("min_price"),
             "max_price": parsed_response.get("max_price"),
             "zip_code": zip_code,
-            "radius": radius
+            "radius": radius,
+            "vehicle_params": vehicle_params  # Include vehicle parameters
         }
         
         return jsonify(result)
