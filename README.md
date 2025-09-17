@@ -132,6 +132,9 @@ The application supports major Craigslist regions (and all zip codes) :
 - **sss**: General Search
 - Almost ALL categories in Craigslist are supported - the above are just some common/general ones.
 
+
+### Abilty to search titles only, search for clean titles (cars), and almost every single Craigslist parameter is supported.
+
 ### Manual Testing
 1. Start the application
 2. Try various example queries
