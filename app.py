@@ -692,6 +692,7 @@ CRITICAL RULES:
    - NEVER confuse prices with zip codes in your analysis!
 7. CRITICAL: If the user DOES NOT specify a price, DO NOT PUT PRICE PARAMETERS IN THE JSON.
 8. CRITICAL: NEVER extract mileage as price. "100k miles" is MILEAGE, not "$100". Only extract prices when there are clear price indicators like "$", "under", "budget", "price", "cost".
+9. CRITICAL: IF the user does not specify a specific car/item (such as "fun manual cars") give valid inferences based on the user's query (such as, if the user asks for "fun manual cars" give suggestions you think are valid like BMW 335i, corvette, etc.), but do NOT search "fun manual cars" as the search query.
 
 EXAMPLES:
 - Query: "black BMW 335i 2010 to 2015 under 100k miles automatic clean title"
