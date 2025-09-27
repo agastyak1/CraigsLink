@@ -457,9 +457,19 @@ def extract_vehicle_parameters(query):
     
     # Paint color
     color_mapping = {
-        'black': 1, 'white': 2, 'silver': 3, 'gray': 4, 'grey': 4,
-        'red': 5, 'blue': 6, 'green': 7, 'brown': 8, 'gold': 9,
-        'yellow': 10, 'orange': 11, 'purple': 12, 'pink': 13
+            'black': 1,
+            'blue': 2,
+            'brown': 3,
+            'green': 4,
+            'grey': 5,
+            'gray': 5,   
+            'orange': 6,
+            'purple': 7,
+            'red': 8,
+            'white': 9,
+            'silver': 10,
+            'yellow': 11,
+            'custom': 20
     }
     
     for term, code in color_mapping.items():
@@ -676,7 +686,7 @@ def generate_link():
         min_price, max_price = extract_price_from_query(user_query)
         
         # Prepare prompt for Ollama Mistral 7B
-        system_prompt = """You are an expert Craigslist searcher. Extract from user request: 3-5 specific item recommendations, price range (min/max), and the MOST ACCURATE Craigslist category. Return JSON only:
+        system_prompt = """You are an expert Craigslist searcher. Extract from user request: 3-5 specific item recommendations, price range (min/max), different parameters, and the MOST ACCURATE Craigslist category. Return JSON only:
 
 {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
 
@@ -693,7 +703,8 @@ CRITICAL RULES:
 7. CRITICAL: If the user DOES NOT specify a price, DO NOT PUT PRICE PARAMETERS IN THE JSON.
 8. CRITICAL: NEVER extract mileage as price. "100k miles" is MILEAGE, not "$100". Only extract prices when there are clear price indicators like "$", "under", "budget", "price", "cost".
 9. CRITICAL: IF the user does not specify a specific car/item (such as "fun manual cars") give valid inferences based on the user's query (such as, if the user asks for "fun manual cars" give suggestions you think are valid like BMW 335i, corvette, etc.), but do NOT search "fun manual cars" as the search query.
-
+10. CRITICAL: When the user specifies vehicle-specific details (such as white color) make sure to KEEP THE COLOR IN THE URL PARAMETER EXACTLY AS THE USER SPECIFIES, IF THE USER SPECIFIES.
+11. DO NOT DEFAULT TO A RANDOM COLOR (such as blue) IN THE URL PARAMETERS IF THE USER DOES NOT SPECIFY A COLOR. MAKE SURE TO ABSOLUTELY FOLLOW THE USER'S SPECIFICATIONS AT ALL COSTS.
 EXAMPLES:
 - Query: "black BMW 335i 2010 to 2015 under 100k miles automatic clean title"
 - CORRECT: {"recommendations": ["BMW 335i", "BMW 3 Series", "BMW 335i Sedan"], "category": "cta"}
@@ -710,6 +721,12 @@ EXAMPLES:
 - Query: "BMW 335i 2010 to 2015 under 100k miles automatic clean title"
 - CORRECT: {"recommendations": ["BMW 335i", "BMW 3 Series", "BMW 335i Sedan"], "category": "cta"}
 - WRONG: {"recommendations": ["BMW 335i", "BMW 3 Series"], "max_price": 100, "category": "cta"}
+
+- Query: "white bmw i3 within 100 miles of 94086 under 100k miles clean title"
+- CORRECT: Proper recomendation with THE COLOR WHITE IN THE URL PARAMETER: https://sfbay.craigslist.org/search/cta?auto_paint=9&auto_title_status=1&max_auto_miles=100000&postal=94086&query=BMW%20i3&search_distance=100#search=2~gallery~0
+- WRONG: Proper recommendation with the color blue in the URL parameter, which is NOT what the user specified:https://sfbay.craigslist.org/search/cta?auto_paint=2&auto_title_status=1&max_auto_miles=100000&postal=94086&query=BMW%20i3&search_distance=100#search=2~gallery~0
+
+
 
 PRICE vs ZIP CODE vs MILEAGE DISTINCTION:
 - PRICES: Look for "$" symbol, "under", "less than", "budget", "price", "cost"

@@ -1,18 +1,18 @@
 /* CSS Variables for theming */
 :root {
-    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f8f9fa;
-    --text-primary: #333333;
+    --bg-primary: #ffffff; 
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
     --text-secondary: #6c757d;
     --text-tertiary: #495057;
-    --border-color: #e1e5e9;
-    --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    --border-color: #dee2e6;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     --card-bg: #ffffff;
-    --input-bg: #f8f9fa;
-    --button-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --button-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    --accent-color: #667eea;
+    --input-bg: #ffffff;
+    --button-primary: #007bff;
+    --button-hover: #0056b3;
+    --accent-color: #007bff;
     --success-color: #28a745;
     --error-color: #dc3545;
 }
@@ -34,6 +34,17 @@ body.dark {
     --accent-color: #667eea;
     --success-color: #28a745;
     --error-color: #dc3545;
+}
+
+/* Dark theme specific Craigslist link styling */
+body.dark .craigslist-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+body.dark .craigslist-link:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 /* Reset and base styles */
@@ -65,7 +76,7 @@ body {
 .header {
     text-align: center;
     margin-bottom: 40px;
-    color: white;
+    color: var(--text-primary);
     position: relative;
 }
 
@@ -83,8 +94,8 @@ body {
 }
 
 .theme-toggle-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 50%;
     width: 44px;
     height: 44px;
@@ -93,12 +104,13 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: white;
-    backdrop-filter: blur(10px);
+    color: var(--text-primary);
 }
 
 .theme-toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
     transform: scale(1.1);
 }
 
@@ -118,7 +130,7 @@ body {
 
 .title i {
     font-size: 2rem;
-    color: #ffd700;
+    color: var(--accent-color);
 }
 
 .subtitle {
@@ -169,7 +181,7 @@ body {
     outline: none;
     border-color: var(--accent-color);
     background: var(--card-bg);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .generate-btn {
@@ -191,7 +203,7 @@ body {
 
 .generate-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
     background: var(--button-hover);
 }
 
@@ -295,7 +307,7 @@ body {
 }
 
 .explanation i {
-    color: #ffd700;
+    color: var(--accent-color);
     font-size: 1.2rem;
     margin-top: 2px;
 }
@@ -380,7 +392,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    background: #ff6600;
+    background: var(--button-primary);
     color: white;
     text-decoration: none;
     padding: 16px 32px;
@@ -388,15 +400,15 @@ body {
     font-weight: 600;
     font-size: 16px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     width: 100%;
     justify-content: center;
 }
 
 .craigslist-link:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 102, 0, 0.4);
-    background: #e55a00;
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+    background: var(--button-hover);
 }
 
 .no-links {
@@ -423,7 +435,7 @@ body {
 
 .loading-spinner i {
     font-size: 3rem;
-    color: #667eea;
+    color: var(--accent-color);
 }
 
 .loading-card p {
@@ -485,7 +497,7 @@ body {
 .footer {
     text-align: center;
     margin-top: 40px;
-    color: white;
+    color: var(--text-secondary);
     opacity: 0.8;
     font-size: 14px;
 }
