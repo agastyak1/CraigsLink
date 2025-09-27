@@ -1,6 +1,6 @@
 # CraigsLink - easily surf Craigslist utilizing natural language prompts
 
-An intelligent web application that uses OpenAI's GPT to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
+An intelligent web application that uses an LLM (Mistral 7b) to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
 
 ## Features
 
