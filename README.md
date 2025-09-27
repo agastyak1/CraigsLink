@@ -13,13 +13,11 @@ An intelligent web application that uses OpenAI's GPT to understand user intent 
 - **Example Queries**: Click-to-try example searches
 ## Application Examples
 - Dark mode example
-![CraigsLink Dark](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkDark.png)
+![CLdarknew](https://github.com/agastyak1/CraigsLink/blob/0b686c2cccb5290c1c8c1474a8369ebc6c95e780/craigsLinkResults/CLdarknew.png?raw=true)
 - Light mode example
-![CraigsLink Light](https://github.com/agastyak1/CraigsLink/raw/8dac487eca31908cb65d953b3242efc7c5a51b0c/craigsLinkResults/craigslinkLight.png)
-- LLM processing example
-![CraigsLink Processing](https://github.com/agastyak1/CraigsLink/raw/a09bbcebb108fe7ee9964eae355098917186790c/craigsLinkResults/craigsLinkProcessing2.png)
-- Results example
-![CraigsLink Results 2](https://github.com/agastyak1/CraigsLink/blob/a09bbcebb108fe7ee9964eae355098917186790c/craigsLinkResults/craigsLinkResults2.png?raw=true)
+![CraigsLink Light](https://github.com/agastyak1/CraigsLink/blob/0b686c2cccb5290c1c8c1474a8369ebc6c95e780/craigsLinkResults/CLnewlight.png?raw=true)
+- Results example (Query:"Find me a Honda Civic under $5000, clean title, with under 100k miles and within 30 miles of 90210")
+![CraigsLink Results Dark Example](https://github.com/agastyak1/CraigsLink/raw/0b686c2cccb5290c1c8c1474a8369ebc6c95e780/craigsLinkResults/resultExampleDark.png)
 ## Quick Start
 
 ### Prerequisites
