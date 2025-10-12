@@ -149,4 +149,4 @@ curl -X POST http://localhost:5000/api/generate-link \
 
 This project under the [GNU Affero General Public License v3.0](LICENSE).
 
-**Built using Flask, Ollama Mistral 7B (local, free), Python, JS, and HTML/CSS**
+**Built using Flask, Ollama Llama 3.1 (local, free), Python, JS, and HTML/CSS**
