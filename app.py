@@ -15,7 +15,7 @@ CORS(app)
 
 # Configure Ollama
 OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
-OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'mistral:latest')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.1:latest')
 
 # Craigslist configuration
 DEFAULT_CITY = "sfbay"  # San Francisco Bay Area
@@ -685,7 +685,7 @@ def generate_link():
         # Extract price information from query
         min_price, max_price = extract_price_from_query(user_query)
         
-        # Prepare prompt for Ollama Mistral 7B
+        # Prepare prompt for Ollama Llama 3.1 8B
         system_prompt = """You are an expert Craigslist searcher. Extract from user request: 3-5 specific item recommendations, price range (min/max), different parameters, and the MOST ACCURATE Craigslist category. Return JSON only:
 
 {"recommendations": ["item1", "item2", "item3"], "min_price": null or number, "max_price": null or number, "category": "category_code", "explanation": "Brief explanation"}
@@ -700,11 +700,14 @@ CRITICAL RULES:
    - PRICES: "under $15000", "less than $1000", "$5000"
    - ZIP CODES: "90210", "10001", "94102"
    - NEVER confuse prices with zip codes in your analysis!
+   - ALWAYS make sure to check if the user has a price range. For example, if the user says "from $800 to $1800" then you should extract the price range as $800 to $1800.
 7. CRITICAL: If the user DOES NOT specify a price, DO NOT PUT PRICE PARAMETERS IN THE JSON.
 8. CRITICAL: NEVER extract mileage as price. "100k miles" is MILEAGE, not "$100". Only extract prices when there are clear price indicators like "$", "under", "budget", "price", "cost".
 9. CRITICAL: IF the user does not specify a specific car/item (such as "fun manual cars") give valid inferences based on the user's query (such as, if the user asks for "fun manual cars" give suggestions you think are valid like BMW 335i, corvette, etc.), but do NOT search "fun manual cars" as the search query.
 10. CRITICAL: When the user specifies vehicle-specific details (such as white color) make sure to KEEP THE COLOR IN THE URL PARAMETER EXACTLY AS THE USER SPECIFIES, IF THE USER SPECIFIES.
 11. DO NOT DEFAULT TO A RANDOM COLOR (such as blue) IN THE URL PARAMETERS IF THE USER DOES NOT SPECIFY A COLOR. MAKE SURE TO ABSOLUTELY FOLLOW THE USER'S SPECIFICATIONS AT ALL COSTS.
+12. ALWAYS assume, when the user provides a car model name they want (Such as "BMW M340i") that they want to search for that specific car model name, and not any other car model name.
+13. IF THE USER SPECIFIES SOMETHING THEY WANT THAT IS A SPECIFIC MODEL (such as iPhone 15 Pro) then you should search for that specific model, and not any other model. Make sure to DIRECTLY follow what the user wants.
 EXAMPLES:
 - Query: "black BMW 335i 2010 to 2015 under 100k miles automatic clean title"
 - CORRECT: {"recommendations": ["BMW 335i", "BMW 3 Series", "BMW 335i Sedan"], "category": "cta"}
@@ -725,8 +728,9 @@ EXAMPLES:
 - Query: "white bmw i3 within 100 miles of 94086 under 100k miles clean title"
 - CORRECT: Proper recomendation with THE COLOR WHITE IN THE URL PARAMETER: https://sfbay.craigslist.org/search/cta?auto_paint=9&auto_title_status=1&max_auto_miles=100000&postal=94086&query=BMW%20i3&search_distance=100#search=2~gallery~0
 - WRONG: Proper recommendation with the color blue in the URL parameter, which is NOT what the user specified:https://sfbay.craigslist.org/search/cta?auto_paint=2&auto_title_status=1&max_auto_miles=100000&postal=94086&query=BMW%20i3&search_distance=100#search=2~gallery~0
-
-
+- Query: "Apple watch in good condition within 20 miles of 90210"
+- CORRECT: Proper recommendation of "Apple watch" and "Apple Watch Series" with the URL Parameter: "https://losangeles.craigslist.org/search/ela?postal=90210&query=Apple%20Watch&search_distance=20#search=2~gallery~0"
+- WRONG: Incorrect recommendation of "Apple watch" and "Apple Watch Series" with the URL Parameter (KEEP IN MIND, USE THE CORRECT CATEGORY FOR ELECTRONICS): "https://losangeles.craigslist.org/search/mca?postal=90210&query=Apple%20Watch&search_distance=20#search=2~gallery~0"
 
 PRICE vs ZIP CODE vs MILEAGE DISTINCTION:
 - PRICES: Look for "$" symbol, "under", "less than", "budget", "price", "cost"
@@ -759,7 +763,7 @@ Key Categories:
 - pet: Pets, animals, livestock
 - sss: General for sale (ONLY if no specific category fits)
 
-IMPORTANT: Mobile devices go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be precise."""
+IMPORTANT: Mobile devices go in 'moa', NOT 'cta'. Electronics go in 'ele'. Be precise. WATCHES go in 'jwa', NOT 'ele'. BE PRECISE."""
         
         user_prompt = f"User request: {user_query}"
         
