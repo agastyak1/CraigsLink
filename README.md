@@ -1,11 +1,11 @@
 # CraigsLink - easily surf Craigslist utilizing natural language prompts
 
-An intelligent web application that uses an LLM (Mistral 7b) to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
+An intelligent web application that uses an LLM (llama3.1:latest) to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
 
 ## Features
 
 - **Natural Language Processing**: Describe what you want in plain English
-- **AI-Powered Recommendations**: Ollama Mistral 7B (local, free) suggests relevant items and brands
+- **AI-Powered Recommendations**: Ollama Llama 3.1:Latest (local, free) suggests relevant items and brands
 - **Smart Category Detection**: Automatically identifies the best Craigslist category
 - **City/Region Support**: Works with multiple Craigslist regions
 - **Price Filtering**: Automatically extracts and applies price ranges
@@ -24,8 +24,7 @@ An intelligent web application that uses an LLM (Mistral 7b) to understand user 
 
 - Python 3.7 or higher
 - Ollama installed locally ([Download here](https://ollama.ai/))
-- Mistral 7B model has been tested as a balance between speed and accuracy; however, higher parameter models may work better depending on your processing power
-
+- Llama 3.1 model requires around 20GB of free RAM, tested as balance between speed and accuracy; other models can be used though, with varying results
 ### Installation
 
 1. **Clone the repository**
@@ -44,10 +43,10 @@ An intelligent web application that uses an LLM (Mistral 7b) to understand user 
    cp env.example .env
    ```
    
-   Edit `.env` if you want to customize Ollama settings:
+   Edit `.env` if you want to customize Ollama settings OR in app.py:
    ```bash
    OLLAMA_BASE_URL=http://localhost:11434
-   OLLAMA_MODEL=mistral:7b
+   OLLAMA_MODEL=llama3.1:latest
    ```
 
 4. **Run the application**
