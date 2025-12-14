@@ -19,32 +19,33 @@
 
 /* Dark theme variables */
 body.dark {
-    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    --bg-secondary: #0f3460;
-    --bg-tertiary: #16213e;
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-tertiary: #141414;
     --text-primary: #ffffff;
-    --text-secondary: #b8c5d6;
-    --text-tertiary: #a8b5c6;
-    --border-color: #2d3748;
-    --shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    --card-bg: #0f3460;
-    --input-bg: #16213e;
-    --button-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --button-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    --accent-color: #667eea;
-    --success-color: #28a745;
-    --error-color: #dc3545;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #d0d0d0;
+    --border-color: #1a1a1a;
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    --card-bg: #0a0a0a;
+    --input-bg: #141414;
+    --button-primary: #00d4ff;
+    --button-hover: #00b8e6;
+    --accent-color: #00d4ff;
+    --success-color: #00ff88;
+    --error-color: #ff4444;
 }
 
 /* Dark theme specific Craigslist link styling */
 body.dark .craigslist-link {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    background: #00d4ff;
+    color: #000000;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
 }
 
 body.dark .craigslist-link:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    background: #00b8e6;
+    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.6);
 }
 
 /* Reset and base styles */
@@ -181,7 +182,11 @@ body {
     outline: none;
     border-color: var(--accent-color);
     background: var(--card-bg);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+}
+
+body.dark .query-input:focus {
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.3);
 }
 
 .generate-btn {
@@ -201,10 +206,19 @@ body {
     align-self: flex-end;
 }
 
+body.dark .generate-btn {
+    color: #000000;
+    font-weight: 700;
+}
+
 .generate-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(0, 123, 255, 0.3);
     background: var(--button-hover);
+}
+
+body.dark .generate-btn:hover {
+    box-shadow: 0 8px 16px rgba(0, 212, 255, 0.4);
 }
 
 .generate-btn:active {
@@ -405,6 +419,11 @@ body {
     justify-content: center;
 }
 
+body.dark .craigslist-link {
+    color: #000000;
+    font-weight: 700;
+}
+
 .craigslist-link:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
@@ -491,6 +510,14 @@ body {
 .retry-btn:hover {
     background: #c82333;
     transform: translateY(-1px);
+}
+
+body.dark .retry-btn {
+    background: #ff4444;
+}
+
+body.dark .retry-btn:hover {
+    background: #ff6666;
 }
 
 /* Footer */
