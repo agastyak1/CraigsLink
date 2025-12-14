@@ -84,7 +84,7 @@ An intelligent web application that uses an LLM (llama3.1:latest) to understand 
 
 ### Backend (Python/Flask)
 - **Flask**: Web framework for API endpoints
-- **Ollama Mistral 7B**: Natural language processing and recommendations (local, free)
+- **Ollama Open Source Local LLMs**: Natural language processing and recommendations (local, free)
 - **Smart Parsing**: Extracts keywords, prices, and categories
 - **URL Generation**: Creates optimized Craigslist search links
 
