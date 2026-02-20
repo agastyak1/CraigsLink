@@ -1,7 +1,7 @@
 # CraigsLink - easily surf Craigslist utilizing natural language prompts
 
 An intelligent web application that uses an LLM (llama3.1:latest) to understand user intent and generate optimized Craigslist search links. Simply describe what you're looking for in natural language, and the AI will create the perfect search query with relevant keywords and filters. 
-
+NOTE: may switch to a lightweight Ministral or Gemma3 model for better results. 
 ## Features
 
 - **Natural Language Processing**: Describe what you want in plain English
